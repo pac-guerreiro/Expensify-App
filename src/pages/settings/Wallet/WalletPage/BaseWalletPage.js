@@ -12,7 +12,6 @@ import compose from '../../../../libs/compose';
 import * as BankAccounts from '../../../../libs/actions/BankAccounts';
 import Popover from '../../../../components/Popover';
 import MenuItem from '../../../../components/MenuItem';
-import Text from '../../../../components/Text';
 import * as PaymentMethods from '../../../../libs/actions/PaymentMethods';
 import getClickedTargetLocation from '../../../../libs/getClickedTargetLocation';
 import CurrentWalletBalance from '../../../../components/CurrentWalletBalance';
@@ -32,6 +31,9 @@ import themeColors from '../../../../styles/themes/default';
 import variables from '../../../../styles/variables';
 import useLocalize from '../../../../hooks/useLocalize';
 import useWindowDimensions from '../../../../hooks/useWindowDimensions';
+import WalletEmptyState from '../WalletEmptyState';
+import * as Illustrations from '../../../../components/Icon/Illustrations';
+import WalletSection from '../WalletSection';
 
 function BaseWalletPage(props) {
     const {translate} = useLocalize();
@@ -259,58 +261,6 @@ function BaseWalletPage(props) {
         setShouldShowDefaultDeleteMenu(false);
     };
 
-    const listHeaderComponent = useCallback(
-        () => (
-            <>
-                {Permissions.canUseWallet(props.betas) && (
-                    <>
-                        <View style={[styles.mv5]}>
-                            {shouldShowLoadingSpinner ? (
-                                <ActivityIndicator
-                                    color={themeColors.spinner}
-                                    size="large"
-                                />
-                            ) : (
-                                <OfflineWithFeedback
-                                    pendingAction={CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD}
-                                    errors={props.walletTerms.errors}
-                                    onClose={PaymentMethods.clearWalletTermsError}
-                                    errorRowStyles={[styles.ml10, styles.mr2]}
-                                >
-                                    <CurrentWalletBalance />
-                                </OfflineWithFeedback>
-                            )}
-                        </View>
-                        {props.userWallet.currentBalance > 0 && (
-                            <View style={styles.mb3}>
-                                <KYCWall
-                                    onSuccessfulKYC={navigateToTransferBalancePage}
-                                    enablePaymentsRoute={ROUTES.SETTINGS_ENABLE_PAYMENTS}
-                                    addBankAccountRoute={ROUTES.SETTINGS_ADD_BANK_ACCOUNT}
-                                    addDebitCardRoute={ROUTES.SETTINGS_ADD_DEBIT_CARD}
-                                    popoverPlacement="bottom"
-                                >
-                                    {(triggerKYCFlow, buttonRef) => (
-                                        <MenuItem
-                                            ref={buttonRef}
-                                            title={translate('common.transferBalance')}
-                                            icon={Expensicons.Transfer}
-                                            onPress={triggerKYCFlow}
-                                            shouldShowRightIcon
-                                            disabled={props.network.isOffline}
-                                        />
-                                    )}
-                                </KYCWall>
-                            </View>
-                        )}
-                    </>
-                )}
-                <Text style={[styles.ph5, styles.textLabelSupporting, styles.mb1]}>{translate('walletPage.paymentMethodsTitle')}</Text>
-            </>
-        ),
-        [props.betas, props.network.isOffline, props.userWallet.currentBalance, props.walletTerms.errors, shouldShowLoadingSpinner, translate],
-    );
-
     useEffect(() => {
         PaymentMethods.openWalletPage();
     }, []);
@@ -371,32 +321,94 @@ function BaseWalletPage(props) {
     // Determines whether or not the modal popup is mounted from the bottom of the screen instead of the side mount on Web or Desktop screens
     const isPopoverBottomMount = anchorPosition.anchorPositionTop === 0 || isSmallScreenWidth;
 
+    const {bankAccountList, fundList, userWallet} = props;
+    const hasBankAccount = !_.isEmpty(bankAccountList) || !_.isEmpty(fundList);
+    const hasWallet = userWallet.walletLinkedAccountID > 0;
+    const hasAssignedCard = false;
+
     return (
         <ScreenWrapper>
-            <HeaderWithBackButton
-                title={translate('common.wallet')}
-                onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS)}
-            />
-            <View style={[styles.flex1, styles.mb4]}>
-                <OfflineWithFeedback
-                    style={styles.flex1}
-                    contentContainerStyle={styles.flex1}
-                    onClose={() => PaymentMethods.clearWalletError()}
-                    errors={props.userWallet.errors}
-                    errorRowStyles={[styles.ph6]}
-                >
-                    <PaymentMethodList
-                        onPress={paymentMethodPressed}
-                        style={[styles.flex4]}
-                        isAddPaymentMenuActive={shouldShowAddPaymentMenu}
-                        actionPaymentMethodType={shouldShowDefaultDeleteMenu ? paymentMethod.selectedPaymentMethodType : ''}
-                        activePaymentMethodID={shouldShowDefaultDeleteMenu ? getSelectedPaymentMethodID() : ''}
-                        listHeaderComponent={listHeaderComponent}
-                        buttonRef={addPaymentMethodAnchorRef}
-                        onListContentSizeChange={shouldShowAddPaymentMenu || shouldShowDefaultDeleteMenu ? setMenuPosition : () => {}}
+            {!hasWallet && !hasBankAccount && !hasAssignedCard ? (
+                <WalletEmptyState onAddPaymentMethod={paymentMethodPressed} />
+            ) : (
+                <>
+                    <HeaderWithBackButton
+                        title={translate('common.wallet')}
+                        onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS)}
                     />
-                </OfflineWithFeedback>
-            </View>
+                    <View style={[styles.flex1, styles.mb4]}>
+                        <OfflineWithFeedback
+                            style={styles.flex1}
+                            contentContainerStyle={styles.flex1}
+                            onClose={() => PaymentMethods.clearWalletError()}
+                            errors={props.userWallet.errors}
+                            errorRowStyles={[styles.ph6]}
+                        >
+                            {hasWallet ? (
+                                <WalletSection
+                                    icon={Illustrations.MoneyIntoWallet}
+                                    subtitle={translate('walletPage.sendAndReceiveMoney')}
+                                    title={translate('walletPage.expensifyWallet')}
+                                >
+                                    <>
+                                        {shouldShowLoadingSpinner ? (
+                                            <ActivityIndicator
+                                                color={themeColors.spinner}
+                                                size="large"
+                                            />
+                                        ) : (
+                                            <OfflineWithFeedback
+                                                pendingAction={CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD}
+                                                errors={props.walletTerms.errors}
+                                                onClose={PaymentMethods.clearWalletTermsError}
+                                                errorRowStyles={[styles.ml10, styles.mr2]}
+                                            >
+                                                <CurrentWalletBalance balanceStyles={[styles.mb3]} />
+                                            </OfflineWithFeedback>
+                                        )}
+                                        <KYCWall
+                                            onSuccessfulKYC={navigateToTransferBalancePage}
+                                            enablePaymentsRoute={ROUTES.SETTINGS_ENABLE_PAYMENTS}
+                                            addBankAccountRoute={ROUTES.SETTINGS_ADD_BANK_ACCOUNT}
+                                            addDebitCardRoute={ROUTES.SETTINGS_ADD_DEBIT_CARD}
+                                            popoverPlacement="bottom"
+                                        >
+                                            {(triggerKYCFlow, buttonRef) => (
+                                                <MenuItem
+                                                    ref={buttonRef}
+                                                    title={translate('common.transferBalance')}
+                                                    icon={Expensicons.Transfer}
+                                                    onPress={triggerKYCFlow}
+                                                    shouldShowRightIcon
+                                                    disabled={props.network.isOffline}
+                                                    style={[styles.p0, styles.flexRow, styles.justifyContentBetween]}
+                                                />
+                                            )}
+                                        </KYCWall>
+                                    </>
+                                </WalletSection>
+                            ) : null}
+                            <WalletSection
+                                icon={Illustrations.BankArrow}
+                                subtitle={translate('walletPage.addBankAccountToSendAndReceive')}
+                                title={translate('walletPage.bankAccounts')}
+                            >
+                                <PaymentMethodList
+                                    shouldShowAddPaymentMethodButton={false}
+                                    shouldShowEmptyListMessage={false}
+                                    onPress={paymentMethodPressed}
+                                    style={[styles.flex4]}
+                                    isAddPaymentMenuActive={shouldShowAddPaymentMenu}
+                                    actionPaymentMethodType={shouldShowDefaultDeleteMenu ? paymentMethod.selectedPaymentMethodType : ''}
+                                    activePaymentMethodID={shouldShowDefaultDeleteMenu ? getSelectedPaymentMethodID() : ''}
+                                    buttonRef={addPaymentMethodAnchorRef}
+                                    onListContentSizeChange={shouldShowAddPaymentMenu || shouldShowDefaultDeleteMenu ? setMenuPosition : () => {}}
+                                />
+                            </WalletSection>
+                        </OfflineWithFeedback>
+                    </View>
+                </>
+            )}
             <AddPaymentMethodMenu
                 isVisible={shouldShowAddPaymentMenu}
                 onClose={hideAddPaymentMenu}

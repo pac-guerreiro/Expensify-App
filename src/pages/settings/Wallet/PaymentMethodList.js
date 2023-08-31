@@ -40,6 +40,9 @@ const propTypes = {
     /** Whether the add Payment button be shown on the list */
     shouldShowAddPaymentMethodButton: PropTypes.bool,
 
+    /** Whether the empty list message should be shown when the list is empty */
+    shouldShowEmptyListMessage: PropTypes.string,
+
     /** Are we loading payment methods? */
     isLoadingPaymentMethods: PropTypes.bool,
 
@@ -86,6 +89,7 @@ const defaultProps = {
     },
     isLoadingPaymentMethods: true,
     shouldShowAddPaymentMethodButton: true,
+    shouldShowEmptyListMessage: true,
     filterType: '',
     actionPaymentMethodType: '',
     activePaymentMethodID: '',
@@ -189,6 +193,18 @@ function PaymentMethodList(props) {
      */
     const renderListEmptyComponent = useCallback(() => <Text style={[styles.popoverMenuItem]}>{translate('paymentMethodList.addFirstPaymentMethod')}</Text>, [translate]);
 
+    const renderListFooterComponent = useCallback(
+        () => (
+            <MenuItem
+                onPress={props.onPress}
+                title={translate('walletPage.addBankAccount')}
+                icon={Expensicons.Plus}
+                style={[styles.p0, styles.flexRow, styles.justifyContentBetween]}
+            />
+        ),
+        [props.onPress, translate],
+    );
+
     /**
      * Create a menuItem for each passed paymentMethod
      *
@@ -218,10 +234,11 @@ function PaymentMethodList(props) {
                     wrapperStyle={item.wrapperStyle}
                     shouldShowSelectedState={shouldShowSelectedState}
                     isSelected={selectedMethodID === item.methodID}
+                    style={[styles.ph0, styles.pv3, styles.flexRow, styles.justifyContentBetween]}
                 />
             </OfflineWithFeedback>
         ),
-        [shouldShowSelectedState, selectedMethodID, filteredPaymentMethods, translate],
+        [filteredPaymentMethods, translate, shouldShowSelectedState, selectedMethodID],
     );
 
     return (
@@ -230,8 +247,9 @@ function PaymentMethodList(props) {
                 data={filteredPaymentMethods}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.key}
-                ListEmptyComponent={renderListEmptyComponent(translate)}
+                ListEmptyComponent={props.shouldShowEmptyListMessage ? renderListEmptyComponent(translate) : null}
                 ListHeaderComponent={props.listHeaderComponent}
+                ListFooterComponent={renderListFooterComponent}
                 onContentSizeChange={props.onListContentSizeChange}
             />
             {props.shouldShowAddPaymentMethodButton && (

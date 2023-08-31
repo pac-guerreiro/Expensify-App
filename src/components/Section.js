@@ -14,6 +14,9 @@ const propTypes = {
     /** The text to display in the title of the section */
     title: PropTypes.string.isRequired,
 
+    /** The text to display in the subtitle of the section */
+    subtitle: PropTypes.string,
+
     /** The icon to display along with the title */
     icon: PropTypes.func,
 
@@ -39,6 +42,7 @@ const defaultProps = {
     IconComponent: null,
     containerStyles: [],
     iconContainerStyles: [],
+    subtitle: null,
 };
 
 function Section(props) {
@@ -61,6 +65,12 @@ function Section(props) {
                         {Boolean(IconComponent) && <IconComponent />}
                     </View>
                 </View>
+
+                {props.subtitle ? (
+                    <View style={[styles.flexRow, styles.alignItemsCenter, styles.w100]}>
+                        <Text style={[styles.textNormal, styles.mt4, styles.mb6]}>{props.subtitle}</Text>
+                    </View>
+                ) : null}
 
                 <View style={[styles.w100]}>{props.children}</View>
 
