@@ -61,9 +61,9 @@ function BaseWalletPage(props) {
     const [showConfirmDeleteContent, setShowConfirmDeleteContent] = useState(false);
 
     const {bankAccountList, fundList, userWallet} = props;
-    const hasBankAccount = !_.isEmpty(bankAccountList) || !_.isEmpty(fundList);
+    const hasBankAccount = !_.isEmpty(bankAccountList);
     const hasWallet = userWallet.walletLinkedAccountID > 0;
-    const hasAssignedCard = false;
+    const hasAssignedCard = !_.isEmpty(fundList);
     const shouldShowEmptyState = !hasBankAccount && !hasWallet && !hasAssignedCard;
 
     const updateShouldShowLoadingSpinner = useCallback(() => {
