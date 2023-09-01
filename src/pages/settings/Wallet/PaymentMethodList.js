@@ -199,7 +199,7 @@ function PaymentMethodList(props) {
                 onPress={props.onPress}
                 title={translate('walletPage.addBankAccount')}
                 icon={Expensicons.Plus}
-                style={[styles.p0, styles.flexRow, styles.justifyContentBetween]}
+                wrapperStyle={[styles.cardMenuItem]}
             />
         ),
         [props.onPress, translate],
@@ -231,10 +231,9 @@ function PaymentMethodList(props) {
                     iconHeight={item.iconSize}
                     iconWidth={item.iconSize}
                     badgeText={shouldShowDefaultBadge(filteredPaymentMethods, item.isDefault) ? translate('paymentMethodList.defaultPaymentMethod') : null}
-                    wrapperStyle={item.wrapperStyle}
+                    wrapperStyle={[styles.cardMenuItem]}
                     shouldShowSelectedState={shouldShowSelectedState}
                     isSelected={selectedMethodID === item.methodID}
-                    style={[styles.ph0, styles.pv3, styles.flexRow, styles.justifyContentBetween]}
                 />
             </OfflineWithFeedback>
         ),

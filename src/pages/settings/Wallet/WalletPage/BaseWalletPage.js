@@ -381,7 +381,7 @@ function BaseWalletPage(props) {
                                                     onPress={triggerKYCFlow}
                                                     shouldShowRightIcon
                                                     disabled={props.network.isOffline}
-                                                    style={[styles.p0, styles.flexRow, styles.justifyContentBetween]}
+                                                    wrapperStyle={[styles.cardMenuItem]}
                                                 />
                                             )}
                                         </KYCWall>
