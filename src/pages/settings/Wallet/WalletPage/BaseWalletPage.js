@@ -60,6 +60,12 @@ function BaseWalletPage(props) {
     });
     const [showConfirmDeleteContent, setShowConfirmDeleteContent] = useState(false);
 
+    const {bankAccountList, fundList, userWallet} = props;
+    const hasBankAccount = !_.isEmpty(bankAccountList) || !_.isEmpty(fundList);
+    const hasWallet = userWallet.walletLinkedAccountID > 0;
+    const hasAssignedCard = false;
+    const shouldShowEmptyState = !hasBankAccount && !hasWallet && !hasAssignedCard;
+
     const updateShouldShowLoadingSpinner = useCallback(() => {
         // In order to prevent a loop, only update state of the spinner if there is a change
         const showLoadingSpinner = props.isLoadingPaymentMethods || false;
@@ -82,13 +88,12 @@ function BaseWalletPage(props) {
 
         setAnchorPosition({
             anchorPositionTop: position.top + position.height + variables.addPaymentPopoverTopSpacing,
-
             // We want the position to be 13px to the right of the left border
-            anchorPositionRight: windowWidth - position.right + variables.addPaymentPopoverRightSpacing,
-            anchorPositionHorizontal: position.x,
+            anchorPositionRight: windowWidth - position.right - variables.addPaymentPopoverRightSpacing,
+            anchorPositionHorizontal: position.x - (shouldShowEmptyState ? variables.addPaymentMethodLeftSpacing : variables.addBankAccountLeftSpacing),
             anchorPositionVertical: position.y,
         });
-    }, [windowWidth]);
+    }, [shouldShowEmptyState, windowWidth]);
 
     const getSelectedPaymentMethodID = useCallback(() => {
         if (paymentMethod.selectedPaymentMethodType === CONST.PAYMENT_METHODS.PAYPAL) {
@@ -321,14 +326,9 @@ function BaseWalletPage(props) {
     // Determines whether or not the modal popup is mounted from the bottom of the screen instead of the side mount on Web or Desktop screens
     const isPopoverBottomMount = anchorPosition.anchorPositionTop === 0 || isSmallScreenWidth;
 
-    const {bankAccountList, fundList, userWallet} = props;
-    const hasBankAccount = !_.isEmpty(bankAccountList) || !_.isEmpty(fundList);
-    const hasWallet = userWallet.walletLinkedAccountID > 0;
-    const hasAssignedCard = false;
-
     return (
         <ScreenWrapper>
-            {!hasWallet && !hasBankAccount && !hasAssignedCard ? (
+            {shouldShowEmptyState ? (
                 <WalletEmptyState onAddPaymentMethod={paymentMethodPressed} />
             ) : (
                 <>
