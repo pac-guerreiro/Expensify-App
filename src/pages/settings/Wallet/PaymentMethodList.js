@@ -41,7 +41,7 @@ const propTypes = {
     shouldShowAddPaymentMethodButton: PropTypes.bool,
 
     /** Whether the empty list message should be shown when the list is empty */
-    shouldShowEmptyListMessage: PropTypes.string,
+    shouldShowEmptyListMessage: PropTypes.bool,
 
     /** Are we loading payment methods? */
     isLoadingPaymentMethods: PropTypes.bool,

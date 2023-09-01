@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Section from '../../../components/Section';
 
 const propTypes = {
-    icon: PropTypes.string.isRequired,
+    icon: PropTypes.func.isRequired,
     children: PropTypes.node.isRequired,
     subtitle: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
