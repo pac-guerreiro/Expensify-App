@@ -35,7 +35,7 @@ import WalletEmptyState from '../WalletEmptyState';
 import * as Illustrations from '../../../../components/Icon/Illustrations';
 import WalletSection from '../WalletSection';
 
-function BaseWalletPage({bankAccountList, betas, fundList, isLoadingPaymentMethods, network, payPalMeData, shouldListenForResize, userWallet, walletTerms}) {
+function BaseWalletPage({bankAccountList, betas, cardList, fundList, isLoadingPaymentMethods, network, payPalMeData, shouldListenForResize, userWallet, walletTerms}) {
     const {translate} = useLocalize();
     const {isSmallScreenWidth, windowWidth} = useWindowDimensions();
     const [shouldShowAddPaymentMenu, setShouldShowAddPaymentMenu] = useState(false);
@@ -60,9 +60,9 @@ function BaseWalletPage({bankAccountList, betas, fundList, isLoadingPaymentMetho
     });
     const [showConfirmDeleteContent, setShowConfirmDeleteContent] = useState(false);
 
-    const hasBankAccount = !_.isEmpty(bankAccountList);
+    const hasBankAccount = !_.isEmpty(bankAccountList) || !_.isEmpty(fundList);
     const hasWallet = userWallet.walletLinkedAccountID > 0;
-    const hasAssignedCard = !_.isEmpty(fundList);
+    const hasAssignedCard = !_.isEmpty(cardList);
     const shouldShowEmptyState = !hasBankAccount && !hasWallet && !hasAssignedCard;
 
     const updateShouldShowLoadingSpinner = useCallback(() => {
@@ -500,6 +500,9 @@ export default compose(
     withOnyx({
         betas: {
             key: ONYXKEYS.BETAS,
+        },
+        cardList: {
+            key: ONYXKEYS.CARD_LIST,
         },
         walletTransfer: {
             key: ONYXKEYS.WALLET_TRANSFER,
