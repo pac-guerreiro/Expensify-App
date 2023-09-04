@@ -35,7 +35,7 @@ import WalletEmptyState from '../WalletEmptyState';
 import * as Illustrations from '../../../../components/Icon/Illustrations';
 import WalletSection from '../WalletSection';
 
-function BaseWalletPage(props) {
+function BaseWalletPage({bankAccountList, betas, fundList, isLoadingPaymentMethods, network, payPalMeData, shouldListenForResize, userWallet, walletTerms}) {
     const {translate} = useLocalize();
     const {isSmallScreenWidth, windowWidth} = useWindowDimensions();
     const [shouldShowAddPaymentMenu, setShouldShowAddPaymentMenu] = useState(false);
@@ -60,7 +60,6 @@ function BaseWalletPage(props) {
     });
     const [showConfirmDeleteContent, setShowConfirmDeleteContent] = useState(false);
 
-    const {bankAccountList, fundList, userWallet} = props;
     const hasBankAccount = !_.isEmpty(bankAccountList);
     const hasWallet = userWallet.walletLinkedAccountID > 0;
     const hasAssignedCard = !_.isEmpty(fundList);
@@ -68,11 +67,11 @@ function BaseWalletPage(props) {
 
     const updateShouldShowLoadingSpinner = useCallback(() => {
         // In order to prevent a loop, only update state of the spinner if there is a change
-        const showLoadingSpinner = props.isLoadingPaymentMethods || false;
+        const showLoadingSpinner = isLoadingPaymentMethods || false;
         if (showLoadingSpinner !== shouldShowLoadingSpinner) {
-            setShouldShowLoadingSpinner(props.isLoadingPaymentMethods && !props.network.isOffline);
+            setShouldShowLoadingSpinner(isLoadingPaymentMethods && !network.isOffline);
         }
-    }, [props.isLoadingPaymentMethods, props.network.isOffline, shouldShowLoadingSpinner]);
+    }, [isLoadingPaymentMethods, network.isOffline, shouldShowLoadingSpinner]);
 
     const debounceSetShouldShowLoadingSpinner = _.debounce(updateShouldShowLoadingSpinner, CONST.TIMING.SHOW_LOADING_SPINNER_DEBOUNCE_TIME);
 
@@ -227,9 +226,9 @@ function BaseWalletPage(props) {
     }, [setShouldShowDefaultDeleteMenu, setShowConfirmDeleteContent]);
 
     const makeDefaultPaymentMethod = useCallback(() => {
-        const paymentCardList = props.fundList || {};
+        const paymentCardList = fundList || {};
         // Find the previous default payment method so we can revert if the MakeDefaultPaymentMethod command errors
-        const paymentMethods = PaymentUtils.formatPaymentMethods(props.bankAccountList, paymentCardList);
+        const paymentMethods = PaymentUtils.formatPaymentMethods(bankAccountList, paymentCardList);
 
         const previousPaymentMethod = _.find(paymentMethods, (method) => method.isDefault);
         const currentPaymentMethod = _.find(paymentMethods, (method) => method.methodID === paymentMethod.methodID);
@@ -243,8 +242,8 @@ function BaseWalletPage(props) {
         paymentMethod.selectedPaymentMethod.bankAccountID,
         paymentMethod.selectedPaymentMethod.fundID,
         paymentMethod.selectedPaymentMethodType,
-        props.bankAccountList,
-        props.fundList,
+        bankAccountList,
+        fundList,
     ]);
 
     const deletePaymentMethod = useCallback(() => {
@@ -272,26 +271,26 @@ function BaseWalletPage(props) {
 
     useEffect(() => {
         // If the user was previously offline, skip debouncing showing the loader
-        if (!props.network.isOffline) {
+        if (!network.isOffline) {
             updateShouldShowLoadingSpinner();
         } else {
             debounceSetShouldShowLoadingSpinner();
         }
-    }, [props.network.isOffline, debounceSetShouldShowLoadingSpinner, updateShouldShowLoadingSpinner]);
+    }, [network.isOffline, debounceSetShouldShowLoadingSpinner, updateShouldShowLoadingSpinner]);
 
     useEffect(() => {
-        if (props.network.isOffline) {
+        if (network.isOffline) {
             return;
         }
         PaymentMethods.openWalletPage();
-    }, [props.network.isOffline]);
+    }, [network.isOffline]);
 
     useEffect(() => {
-        if (!props.shouldListenForResize) {
+        if (!shouldListenForResize) {
             return;
         }
         setMenuPosition();
-    }, [props.shouldListenForResize, setMenuPosition]);
+    }, [shouldListenForResize, setMenuPosition]);
 
     useEffect(() => {
         if (!shouldShowDefaultDeleteMenu) {
@@ -301,11 +300,11 @@ function BaseWalletPage(props) {
         // We should reset selected payment method state values and close corresponding modals if the selected payment method is deleted
         let shouldResetPaymentMethodData = false;
 
-        if (paymentMethod.selectedPaymentMethodType === CONST.PAYMENT_METHODS.BANK_ACCOUNT && _.isEmpty(props.bankAccountList[paymentMethod.methodID])) {
+        if (paymentMethod.selectedPaymentMethodType === CONST.PAYMENT_METHODS.BANK_ACCOUNT && _.isEmpty(bankAccountList[paymentMethod.methodID])) {
             shouldResetPaymentMethodData = true;
-        } else if (paymentMethod.selectedPaymentMethodType === CONST.PAYMENT_METHODS.DEBIT_CARD && _.isEmpty(props.fundList[paymentMethod.methodID])) {
+        } else if (paymentMethod.selectedPaymentMethodType === CONST.PAYMENT_METHODS.DEBIT_CARD && _.isEmpty(fundList[paymentMethod.methodID])) {
             shouldResetPaymentMethodData = true;
-        } else if (paymentMethod.selectedPaymentMethodType === CONST.PAYMENT_METHODS.PAYPAL && _.isEmpty(props.payPalMeData)) {
+        } else if (paymentMethod.selectedPaymentMethodType === CONST.PAYMENT_METHODS.PAYPAL && _.isEmpty(payPalMeData)) {
             shouldResetPaymentMethodData = true;
         }
         if (shouldResetPaymentMethodData) {
@@ -314,12 +313,12 @@ function BaseWalletPage(props) {
                 hideDefaultDeleteMenu();
             }
         }
-    }, [hideDefaultDeleteMenu, paymentMethod.methodID, paymentMethod.selectedPaymentMethodType, props.bankAccountList, props.fundList, props.payPalMeData, shouldShowDefaultDeleteMenu]);
+    }, [hideDefaultDeleteMenu, paymentMethod.methodID, paymentMethod.selectedPaymentMethodType, bankAccountList, fundList, payPalMeData, shouldShowDefaultDeleteMenu]);
 
     const isPayPalMeSelected = paymentMethod.formattedSelectedPaymentMethod.type === CONST.PAYMENT_METHODS.PAYPAL;
     const shouldShowMakeDefaultButton =
         !paymentMethod.isSelectedPaymentMethodDefault &&
-        Permissions.canUseWallet(props.betas) &&
+        Permissions.canUseWallet(betas) &&
         !isPayPalMeSelected &&
         !(paymentMethod.formattedSelectedPaymentMethod.type === CONST.PAYMENT_METHODS.BANK_ACCOUNT && paymentMethod.selectedPaymentMethod.type === CONST.BANK_ACCOUNT.TYPE.BUSINESS);
 
@@ -340,8 +339,8 @@ function BaseWalletPage(props) {
                         <OfflineWithFeedback
                             style={styles.flex1}
                             contentContainerStyle={styles.flex1}
-                            onClose={() => PaymentMethods.clearWalletError()}
-                            errors={props.userWallet.errors}
+                            onClose={PaymentMethods.clearWalletError}
+                            errors={userWallet.errors}
                             errorRowStyles={[styles.ph6]}
                         >
                             {hasWallet ? (
@@ -354,12 +353,12 @@ function BaseWalletPage(props) {
                                         {shouldShowLoadingSpinner ? (
                                             <ActivityIndicator
                                                 color={themeColors.spinner}
-                                                size="large"
+                                                size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE}
                                             />
                                         ) : (
                                             <OfflineWithFeedback
                                                 pendingAction={CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD}
-                                                errors={props.walletTerms.errors}
+                                                errors={walletTerms.errors}
                                                 onClose={PaymentMethods.clearWalletTermsError}
                                                 errorRowStyles={[styles.ml10, styles.mr2]}
                                             >
@@ -380,7 +379,7 @@ function BaseWalletPage(props) {
                                                     icon={Expensicons.Transfer}
                                                     onPress={triggerKYCFlow}
                                                     shouldShowRightIcon
-                                                    disabled={props.network.isOffline}
+                                                    disabled={network.isOffline}
                                                     wrapperStyle={[styles.cardMenuItem]}
                                                 />
                                             )}

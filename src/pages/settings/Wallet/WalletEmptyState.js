@@ -16,12 +16,11 @@ import variables from '../../../styles/variables';
 import Text from '../../../components/Text';
 
 const propTypes = {
-    /** What to do when a menu item is pressed */
+    /** The function that is called when a menu item is pressed */
     onAddPaymentMethod: PropTypes.func.isRequired,
 };
 
-function WalletEmptyState(props) {
-    const {onAddPaymentMethod} = props;
+function WalletEmptyState({onAddPaymentMethod}) {
     const {translate} = useLocalize();
     return (
         <IllustratedHeaderPageLayout
@@ -70,7 +69,7 @@ function WalletEmptyState(props) {
     );
 }
 
-WalletEmptyState.propTypes = propTypes;
 WalletEmptyState.displayName = 'WalletEmptyState';
+WalletEmptyState.propTypes = propTypes;
 
 export default WalletEmptyState;

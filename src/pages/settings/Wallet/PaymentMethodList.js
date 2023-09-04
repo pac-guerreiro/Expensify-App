@@ -152,10 +152,25 @@ function shouldShowDefaultBadge(filteredPaymentMethods, isDefault = false) {
 function isPaymentMethodActive(actionPaymentMethodType, activePaymentMethodID, paymentMethod) {
     return paymentMethod.accountType === actionPaymentMethodType && paymentMethod.methodID === activePaymentMethodID;
 }
-function PaymentMethodList(props) {
-    const {actionPaymentMethodType, activePaymentMethodID, bankAccountList, fundList, filterType, network, onPress, payPalMeData, shouldShowSelectedState, selectedMethodID, translate} =
-        props;
-
+function PaymentMethodList({
+    actionPaymentMethodType,
+    activePaymentMethodID,
+    bankAccountList,
+    buttonRef,
+    fundList,
+    filterType,
+    isLoadingPaymentMethods,
+    listHeaderComponent,
+    network,
+    onListContentSizeChange,
+    onPress,
+    payPalMeData,
+    shouldShowAddPaymentMethodButton,
+    shouldShowEmptyListMessage,
+    shouldShowSelectedState,
+    selectedMethodID,
+    translate,
+}) {
     const filteredPaymentMethods = useMemo(() => {
         const paymentCardList = fundList || {};
         // Hide any billing cards that are not P2P debit cards for now because you cannot make them your default method, or delete them
@@ -196,13 +211,13 @@ function PaymentMethodList(props) {
     const renderListFooterComponent = useCallback(
         () => (
             <MenuItem
-                onPress={props.onPress}
+                onPress={onPress}
                 title={translate('walletPage.addBankAccount')}
                 icon={Expensicons.Plus}
                 wrapperStyle={[styles.cardMenuItem]}
             />
         ),
-        [props.onPress, translate],
+        [onPress, translate],
     );
 
     /**
@@ -246,26 +261,26 @@ function PaymentMethodList(props) {
                 data={filteredPaymentMethods}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.key}
-                ListEmptyComponent={props.shouldShowEmptyListMessage ? renderListEmptyComponent(translate) : null}
-                ListHeaderComponent={props.listHeaderComponent}
+                ListEmptyComponent={shouldShowEmptyListMessage ? renderListEmptyComponent(translate) : null}
+                ListHeaderComponent={listHeaderComponent}
                 ListFooterComponent={renderListFooterComponent}
-                onContentSizeChange={props.onListContentSizeChange}
+                onContentSizeChange={onListContentSizeChange}
             />
-            {props.shouldShowAddPaymentMethodButton && (
+            {shouldShowAddPaymentMethodButton && (
                 <FormAlertWrapper>
                     {(isOffline) => (
                         <Button
                             text={translate('paymentMethodList.addPaymentMethod')}
                             icon={Expensicons.CreditCard}
-                            onPress={props.onPress}
-                            isDisabled={props.isLoadingPaymentMethods || isOffline}
+                            onPress={onPress}
+                            isDisabled={isLoadingPaymentMethods || isOffline}
                             style={[styles.mh4, styles.buttonCTA]}
                             iconStyles={[styles.buttonCTAIcon]}
                             key="addPaymentMethodButton"
                             success
                             shouldShowRightIcon
                             large
-                            ref={props.buttonRef}
+                            ref={buttonRef}
                         />
                     )}
                 </FormAlertWrapper>

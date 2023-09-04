@@ -1,6 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 import PropTypes from 'prop-types';
+import _ from 'underscore';
 import Text from './Text';
 import styles from '../styles/styles';
 import MenuItemList from './MenuItemList';
@@ -66,7 +67,7 @@ function Section(props) {
                     </View>
                 </View>
 
-                {props.subtitle ? (
+                {!_.isEmpty(props.subtitle) ? (
                     <View style={[styles.flexRow, styles.alignItemsCenter, styles.w100]}>
                         <Text style={[styles.textNormal, styles.mt4, styles.mb6]}>{props.subtitle}</Text>
                     </View>

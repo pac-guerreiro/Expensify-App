@@ -9,8 +9,7 @@ const propTypes = {
     title: PropTypes.string.isRequired,
 };
 
-function WalletSection(props) {
-    const {icon, children, subtitle, title} = props;
+function WalletSection({icon, children, subtitle, title}) {
     return (
         <Section
             icon={icon}
@@ -22,6 +21,7 @@ function WalletSection(props) {
     );
 }
 
+WalletSection.displayName = 'WalletSection';
 WalletSection.propTypes = propTypes;
 
 export default WalletSection;
