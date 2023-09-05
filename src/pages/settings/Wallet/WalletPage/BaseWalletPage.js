@@ -387,6 +387,27 @@ function BaseWalletPage({bankAccountList, betas, cardList, fundList, isLoadingPa
                                     </>
                                 </WalletSection>
                             )}
+                            {hasAssignedCard ? (
+                                <WalletSection
+                                    icon={Illustrations.CreditCardsNew}
+                                    subtitle={translate('walletPage.assignedCardsDescription')}
+                                    title={translate('walletPage.assignedCards')}
+                                >
+                                    <PaymentMethodList
+                                        shouldShowAddBankAccount={false}
+                                        shouldShowAddPaymentMethodButton={false}
+                                        shouldShowAssignedCards
+                                        shouldShowEmptyListMessage={false}
+                                        onPress={paymentMethodPressed}
+                                        style={[styles.flex4]}
+                                        isAddPaymentMenuActive={shouldShowAddPaymentMenu}
+                                        actionPaymentMethodType={shouldShowDefaultDeleteMenu ? paymentMethod.selectedPaymentMethodType : ''}
+                                        activePaymentMethodID={shouldShowDefaultDeleteMenu ? getSelectedPaymentMethodID() : ''}
+                                        buttonRef={addPaymentMethodAnchorRef}
+                                        onListContentSizeChange={shouldShowAddPaymentMenu || shouldShowDefaultDeleteMenu ? setMenuPosition : () => {}}
+                                    />
+                                </WalletSection>
+                            ) : null}
                             <WalletSection
                                 icon={Illustrations.BankArrow}
                                 subtitle={translate('walletPage.addBankAccountToSendAndReceive')}

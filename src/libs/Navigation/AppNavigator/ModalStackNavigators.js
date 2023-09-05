@@ -532,6 +532,13 @@ const SettingsModalStackNavigator = createModalStackNavigator([
         },
         name: 'Settings_Wallet',
     },
+    // TODO: Create domain cards page
+    // {
+    //     getComponent: () => {
+    //         return null;
+    //     },
+    //     name: 'Settings_Wallet_DomainCards',
+    // },
     {
         getComponent: () => {
             const TransferBalancePage = require('../../../pages/settings/Wallet/TransferBalancePage').default;

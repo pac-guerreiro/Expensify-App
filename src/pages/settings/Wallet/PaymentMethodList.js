@@ -23,6 +23,10 @@ import FormAlertWrapper from '../../../components/FormAlertWrapper';
 import OfflineWithFeedback from '../../../components/OfflineWithFeedback';
 import * as PaymentMethods from '../../../libs/actions/PaymentMethods';
 import Log from '../../../libs/Log';
+import Navigation from '../../../libs/Navigation/Navigation';
+import ROUTES from '../../../ROUTES';
+import getBankIcon from '../../../components/Icon/BankIcons';
+import assignedCardPropTypes from './assignedCardPropTypes';
 
 const propTypes = {
     /** What to do when a menu item is pressed */
@@ -34,11 +38,20 @@ const propTypes = {
     /** List of bank accounts */
     bankAccountList: PropTypes.objectOf(bankAccountPropTypes),
 
+    /** List of assigned cards */
+    cardList: PropTypes.objectOf(assignedCardPropTypes),
+
     /** List of user's cards */
     fundList: PropTypes.objectOf(cardPropTypes),
 
+    /** Whether the add bank account button should be shown on the list */
+    shouldShowAddBankAccount: PropTypes.bool,
+
     /** Whether the add Payment button be shown on the list */
     shouldShowAddPaymentMethodButton: PropTypes.bool,
+
+    /** Whether the assigned cards should be shown on the list */
+    shouldShowAssignedCards: PropTypes.bool,
 
     /** Whether the empty list message should be shown when the list is empty */
     shouldShowEmptyListMessage: PropTypes.bool,
@@ -82,13 +95,16 @@ const propTypes = {
 const defaultProps = {
     payPalMeData: {},
     bankAccountList: {},
+    cardList: {},
     fundList: null,
     userWallet: {
         walletLinkedAccountID: 0,
         walletLinkedAccountType: '',
     },
     isLoadingPaymentMethods: true,
+    shouldShowAddBankAccount: true,
     shouldShowAddPaymentMethodButton: true,
+    shouldShowAssignedCards: false,
     shouldShowEmptyListMessage: true,
     filterType: '',
     actionPaymentMethodType: '',
@@ -157,6 +173,7 @@ function PaymentMethodList({
     activePaymentMethodID,
     bankAccountList,
     buttonRef,
+    cardList,
     fundList,
     filterType,
     isLoadingPaymentMethods,
@@ -165,7 +182,9 @@ function PaymentMethodList({
     onListContentSizeChange,
     onPress,
     payPalMeData,
+    shouldShowAddBankAccount,
     shouldShowAddPaymentMethodButton,
+    shouldShowAssignedCards,
     shouldShowEmptyListMessage,
     shouldShowSelectedState,
     selectedMethodID,
@@ -173,6 +192,15 @@ function PaymentMethodList({
 }) {
     const filteredPaymentMethods = useMemo(() => {
         const paymentCardList = fundList || {};
+
+        if (shouldShowAssignedCards) {
+            const assignedCards = _.filter(cardList, (card) => CONST.WALLET.CARD_STATE.includes(card.state));
+            return _.map(assignedCards, (card) => {
+                const icon = getBankIcon(card.bank);
+                return {title: 'Expensify Card', description: card.domainName, onPress: () => Navigation.navigate(ROUTES.getWalletCardRoute(card.domainName)), ...icon};
+            });
+        }
+
         // Hide any billing cards that are not P2P debit cards for now because you cannot make them your default method, or delete them
         const filteredCardList = _.filter(paymentCardList, (card) => card.accountData.additionalData.isP2PDebitCard);
         let combinedPaymentMethods = PaymentUtils.formatPaymentMethods(bankAccountList, filteredCardList, payPalMeData);
@@ -199,7 +227,7 @@ function PaymentMethodList({
         }));
 
         return combinedPaymentMethods;
-    }, [actionPaymentMethodType, activePaymentMethodID, bankAccountList, filterType, network, onPress, payPalMeData, fundList]);
+    }, [fundList, shouldShowAssignedCards, bankAccountList, payPalMeData, filterType, network.isOffline, cardList, actionPaymentMethodType, activePaymentMethodID, onPress]);
 
     /**
      * Render placeholder when there are no payments methods
@@ -247,12 +275,13 @@ function PaymentMethodList({
                     iconWidth={item.iconSize}
                     badgeText={shouldShowDefaultBadge(filteredPaymentMethods, item.isDefault) ? translate('paymentMethodList.defaultPaymentMethod') : null}
                     wrapperStyle={styles.cardMenuItem}
+                    shouldShowRightIcon={shouldShowAssignedCards}
                     shouldShowSelectedState={shouldShowSelectedState}
                     isSelected={selectedMethodID === item.methodID}
                 />
             </OfflineWithFeedback>
         ),
-        [filteredPaymentMethods, translate, shouldShowSelectedState, selectedMethodID],
+        [filteredPaymentMethods, translate, shouldShowAssignedCards, shouldShowSelectedState, selectedMethodID],
     );
 
     return (
@@ -263,7 +292,7 @@ function PaymentMethodList({
                 keyExtractor={(item) => item.key}
                 ListEmptyComponent={shouldShowEmptyListMessage ? renderListEmptyComponent(translate) : null}
                 ListHeaderComponent={listHeaderComponent}
-                ListFooterComponent={renderListFooterComponent}
+                ListFooterComponent={shouldShowAddBankAccount ? renderListFooterComponent : null}
                 onContentSizeChange={onListContentSizeChange}
             />
             {shouldShowAddPaymentMethodButton && (
@@ -299,6 +328,9 @@ export default compose(
     withOnyx({
         bankAccountList: {
             key: ONYXKEYS.BANK_ACCOUNT_LIST,
+        },
+        cardList: {
+            key: ONYXKEYS.CARD_LIST,
         },
         fundList: {
             key: ONYXKEYS.FUND_LIST,

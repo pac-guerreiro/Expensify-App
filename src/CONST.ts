@@ -919,6 +919,7 @@ const CONST = {
     },
 
     WALLET: {
+        CARD_STATE: [2, 3, 4, 7],
         TRANSFER_METHOD_TYPE: {
             INSTANT: 'instant',
             ACH: 'ach',
