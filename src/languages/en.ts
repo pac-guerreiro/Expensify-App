@@ -790,6 +790,10 @@ export default {
         },
         addBankAccountFailure: 'An unexpected error occurred while trying to add your bank account. Please try again.',
     },
+    cardPage: {
+        expensifyCard: 'Expensify Card',
+        availableSpend: 'Remaining spending power',
+    },
     transferAmountPage: {
         transfer: ({amount}: TransferParams) => `Transfer${amount ? ` ${amount}` : ''}`,
         instant: 'Instant (Debit card)',

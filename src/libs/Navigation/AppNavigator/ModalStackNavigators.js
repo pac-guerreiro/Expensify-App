@@ -534,6 +534,13 @@ const SettingsModalStackNavigator = createModalStackNavigator([
     },
     {
         getComponent: () => {
+            const SettingsWalletExpensifyCardPage = require('../../../pages/settings/Wallet/ExpensifyCardPage').default;
+            return SettingsWalletExpensifyCardPage;
+        },
+        name: 'Settings_Wallet_Expensify_Card',
+    },
+    {
+        getComponent: () => {
             const TransferBalancePage = require('../../../pages/settings/Wallet/TransferBalancePage').default;
             return TransferBalancePage;
         },
