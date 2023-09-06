@@ -214,7 +214,7 @@ function PaymentMethodList({
                 onPress={onPress}
                 title={translate('walletPage.addBankAccount')}
                 icon={Expensicons.Plus}
-                wrapperStyle={[styles.cardMenuItem]}
+                wrapperStyle={styles.cardMenuItem}
             />
         ),
         [onPress, translate],
@@ -246,7 +246,7 @@ function PaymentMethodList({
                     iconHeight={item.iconSize}
                     iconWidth={item.iconSize}
                     badgeText={shouldShowDefaultBadge(filteredPaymentMethods, item.isDefault) ? translate('paymentMethodList.defaultPaymentMethod') : null}
-                    wrapperStyle={[styles.cardMenuItem]}
+                    wrapperStyle={styles.cardMenuItem}
                     shouldShowSelectedState={shouldShowSelectedState}
                     isSelected={selectedMethodID === item.methodID}
                 />

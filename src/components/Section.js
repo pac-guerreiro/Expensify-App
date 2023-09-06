@@ -67,11 +67,11 @@ function Section(props) {
                     </View>
                 </View>
 
-                {!_.isEmpty(props.subtitle) ? (
+                {!_.isEmpty(props.subtitle) && (
                     <View style={[styles.flexRow, styles.alignItemsCenter, styles.w100]}>
                         <Text style={[styles.textNormal, styles.mt4, styles.mb6]}>{props.subtitle}</Text>
                     </View>
-                ) : null}
+                )}
 
                 <View style={[styles.w100]}>{props.children}</View>
 

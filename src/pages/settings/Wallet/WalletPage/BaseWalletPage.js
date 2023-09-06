@@ -87,7 +87,7 @@ function BaseWalletPage({bankAccountList, betas, cardList, fundList, isLoadingPa
 
         setAnchorPosition({
             anchorPositionTop: position.top + position.height + variables.addPaymentPopoverTopSpacing,
-            // We want the position to be 13px to the right of the left border
+            // We want the position to be 23px to the right of the left border
             anchorPositionRight: windowWidth - position.right - variables.addPaymentPopoverRightSpacing,
             anchorPositionHorizontal: position.x - (shouldShowEmptyState ? variables.addPaymentMethodLeftSpacing : variables.addBankAccountLeftSpacing),
             anchorPositionVertical: position.y,
@@ -343,7 +343,7 @@ function BaseWalletPage({bankAccountList, betas, cardList, fundList, isLoadingPa
                             errors={userWallet.errors}
                             errorRowStyles={[styles.ph6]}
                         >
-                            {hasWallet ? (
+                            {hasWallet && (
                                 <WalletSection
                                     icon={Illustrations.MoneyIntoWallet}
                                     subtitle={translate('walletPage.sendAndReceiveMoney')}
@@ -380,13 +380,13 @@ function BaseWalletPage({bankAccountList, betas, cardList, fundList, isLoadingPa
                                                     onPress={triggerKYCFlow}
                                                     shouldShowRightIcon
                                                     disabled={network.isOffline}
-                                                    wrapperStyle={[styles.cardMenuItem]}
+                                                    wrapperStyle={styles.cardMenuItem}
                                                 />
                                             )}
                                         </KYCWall>
                                     </>
                                 </WalletSection>
-                            ) : null}
+                            )}
                             <WalletSection
                                 icon={Illustrations.BankArrow}
                                 subtitle={translate('walletPage.addBankAccountToSendAndReceive')}
