@@ -3923,6 +3923,23 @@ const styles = {
         height: 30,
         width: '100%',
     },
+
+    walletCard: {
+        borderRadius: variables.componentBorderRadiusLarge,
+        position: 'relative',
+        alignSelf: 'center',
+        overflow: 'hidden',
+    },
+
+    walletCardHolder: {
+        position: 'absolute',
+        left: 16,
+        bottom: 16,
+        width: 160,
+        color: themeColors.text,
+        fontSize: variables.fontSizeLabel,
+        lineHeight: variables.lineHeightLarge,
+    },
 };
 
 export default styles;

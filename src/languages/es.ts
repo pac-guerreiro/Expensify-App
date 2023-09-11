@@ -804,6 +804,10 @@ export default {
         addBankAccountToSendAndReceive: 'Añade una cuenta bancaria para enviar y recibir pagos directamente en la aplicación.',
         addBankAccount: 'Agregar cuenta bancaria',
     },
+    cardPage: {
+        expensifyCard: 'Tarjeta Expensify',
+        availableSpend: 'Poder de gasto restante',
+    },
     transferAmountPage: {
         transfer: ({amount}: TransferParams) => `Transferir${amount ? ` ${amount}` : ''}`,
         instant: 'Instante',

@@ -802,6 +802,10 @@ export default {
         assignedCards: 'Assigned cards',
         assignedCardsDescription: 'These are cards assigned by a Workspace admin to manage company spend.',
     },
+    cardPage: {
+        expensifyCard: 'Expensify Card',
+        availableSpend: 'Remaining spending power',
+    },
     transferAmountPage: {
         transfer: ({amount}: TransferParams) => `Transfer${amount ? ` ${amount}` : ''}`,
         instant: 'Instant (Debit card)',
